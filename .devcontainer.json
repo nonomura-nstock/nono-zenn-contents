@@ -4,7 +4,7 @@
     "features": {
       "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
     },
-    "postCreateCommand": "npm install -g @openai/codex && npm init --yes && npm install zenn-cli && npx zenn init",
+    "postCreateCommand": "git submodule update --init --recursive && npm install -g @openai/codex && npm init --yes && npm install zenn-cli && npx zenn init",
     "customizations": {
       "vscode": {
         "extensions": [

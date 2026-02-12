@@ -1,0 +1,41 @@
+{
+  "filters": {},
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 120
+      },
+      "max-ten": {
+        "max": 4
+      },
+      "arabic-kanji-numbers": true,
+      "no-mix-dearu-desumasu": {
+        "preferInHeader": "",
+        "preferInBody": "ですます",
+        "strict": true
+      },
+      "ja-no-weak-phrase": false,
+      "ja-no-successive-word": true,
+      "ja-no-mixed-period": {
+        "periodMark": "。",
+        "allowPeriodMarks": []
+      },
+      "no-exclamation-question-mark": false,
+      "no-doubled-joshi": {
+        "strict": false,
+        "allow": ["か", "も", "や"]
+      }
+    },
+    "preset-japanese": {
+      "sentence-length": false,
+      "max-ten": false,
+      "no-mix-dearu-desumasu": false
+    },
+    "prh": {
+      "rulePaths": [
+        "./prh-rules.yml"
+      ]
+    },
+    "spellcheck-tech-word": true
+  }
+}

@@ -1,0 +1,16 @@
+# submodule
+writing-guideline/
+
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+
+# Zenn CLI generated
+.zenn/
+
+# other
+.git/
+*.log

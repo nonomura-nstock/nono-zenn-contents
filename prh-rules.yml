@@ -1,0 +1,69 @@
+# 表記ゆれチェックルール（writing-guideline準拠）
+version: 1
+
+rules:
+  # 技術用語の正しい表記
+  - expected: GitHub
+    patterns:
+      - Github
+      - github
+    prh: 公式表記に従う
+
+  - expected: TypeScript
+    patterns:
+      - Typescript
+      - typescript
+    prh: 公式表記に従う
+
+  - expected: JavaScript
+    patterns:
+      - Javascript
+      - javascript
+    prh: 公式表記に従う
+
+  - expected: Next.js
+    patterns:
+      - NextJS
+      - Nextjs
+      - nextjs
+    prh: 公式表記に従う
+
+  - expected: PostgreSQL
+    patterns:
+      - Postgres
+      - postgres
+    prh: 公式表記に従う
+
+  # カタカナ語の長音符統一
+  - expected: サーバー
+    patterns: /サーバ(?!ー)/
+    prh: 長音符を付ける
+
+  - expected: ユーザー
+    patterns: /ユーザ(?!ー)/
+    prh: 長音符を付ける
+
+  - expected: ブラウザー
+    patterns: /ブラウザ(?!ー)/
+    prh: 長音符を付ける
+
+  - expected: コンピューター
+    patterns: /コンピュータ(?!ー)/
+    prh: 長音符を付ける
+
+  # 句読点の統一
+  - expected: 。
+    pattern: /\.$(?![\s\S]*```)/ # コードブロック外のピリオド
+    prh: 句点は「。」を使用する
+
+  - expected: 、
+    pattern: /,(?![^`]*`)/ # コード外のカンマ
+    prh: 読点は「、」を使用する
+
+  # よくある表記ゆれ
+  - expected: タイムゾーン
+    patterns:
+      - timezone
+      - Timezone
+      - タイム・ゾーン
+    prh: カタカナ表記に統一

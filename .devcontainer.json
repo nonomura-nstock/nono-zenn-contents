@@ -9,7 +9,8 @@
       "vscode": {
         "extensions": [
           "negokaz.zenn-editor",
-          "anthropic.claude-code"
+          "anthropic.claude-code",
+          "taichi.vscode-textlint"
         ]
       }
     }

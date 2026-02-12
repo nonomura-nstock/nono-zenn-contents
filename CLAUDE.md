@@ -2,6 +2,11 @@
 
 このリポジトリは **Zenn テックブログ記事** を執筆するための環境です。記事の執筆・編集・レビューを行う際は、必ず `writing-guideline/guideline.md` に記載されたガイドラインに準拠してください。
 
+## Submodule 運用ルール
+
+- `writing-guideline` は Git submodule のため、直接編集しない
+- ガイドラインの変更が必要な場合は、submodule 側のリポジトリで変更し、このリポジトリでは submodule の参照更新のみ行う
+
 ## 基本方針
 
 ### 文体とトーン
@@ -141,8 +146,17 @@ published: false # 公開状態
 2. **執筆**: 上記ガイドラインに従って執筆
 3. **動作確認**: コードサンプルは必ず動作確認を行う
 4. **プレビュー**: `npx zenn preview` でローカルプレビューを確認
-5. **セルフレビュー**: `writing-guideline/guideline.md` のチェックリストで確認
-6. **公開**: Front Matter の `published` を `true` に変更
+5. **AIレビュー**: `/review-article articles/記事名.md` でレビューを実行（推奨）
+6. **修正**: レビュー結果を踏まえて修正
+7. **公開**: Front Matter の `published` を `true` に変更
+
+## 記事レビュー（AI統合版）
+
+`/review-article` の運用手順・出力形式は `review-article-core.md` を参照する。
+
+```bash
+/review-article articles/記事名.md
+```
 
 ## 参考資料
 

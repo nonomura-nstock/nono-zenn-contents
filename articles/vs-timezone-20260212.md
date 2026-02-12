@@ -127,9 +127,9 @@ OSのタイムゾーンに依存せず常にアプリケーションで制御す
 
 * 日付はLocalDateを用いる。またJSTとする。
 * 日時はOffsetDateTimeを用いる。
-* ZonedDateTime, LocalDateTimeは利用禁止
+* ZonedDateTime、 LocalDateTimeは利用禁止
 
-日付にLocalDateを用いることは大きな議論はなく決まりました。またLocalDateTimeはタイムゾーン, Offsetを含まないため混在時のリスクが大きいことから禁止としました（関連する別の課題もありますが後述します）。
+日付にLocalDateを用いることは大きな議論はなく決まりました。またLocalDateTimeはタイムゾーン、 Offsetを含まないため混在時のリスクが大きいことから禁止としました（関連する別の課題もありますが後述します）。
 
 ZonedDateTimeを禁止するモチベーションは積極的ではありませんが、OffsetDateTimeで十分取り回しうることと、当面（夏時間対応のような要件が出てくるまでは）OffsetDateTimeで対応しきれることから、実装方法の分散を避けるため一旦禁止としました。
 
@@ -266,14 +266,14 @@ public final class ClockProvider {
 
 アプリケーション内での時刻の生成についてはこれで統一できました。これでシステム内で取り扱うOffsetDateTimeはすべて `Asia/Tokyo` のOffsetのものになった…かというと、もう一段あります。
 
-我々はPostgreSQLを利用しており、日時の保存には `timestamp with time zone` を利用しています。この場合、DBに保存される値は常にUTCに補正して格納されます。その上で読み出し時はDB Sessionに設定されたtimezoneを元に復元されます。
+我々はPostgreSQLを利用しており、日時の保存には `timestamp with time zone` を利用しています。この場合、DBに保存される値は常にUTCに補正して格納されます。その上で読み出し時はDB セッションに設定されたタイムゾーンを元に復元されます。
 
 https://www.postgresql.jp/document/15/html/datatype-datetime.html
 > timestamp with time zoneについて内部に格納されている値は常にUTCです
 > timestamp with time zoneの値が出力されると、この値はUTCから現行のtimezoneに変換され、その時間帯のローカル時間として表示されます。
 > TimeZoneはpostgresql.confファイルや第20章で説明する他の標準的な方法で設定することができます。
 
-これまで我々はsessionに対して有効なタイムゾーンを設定していなかったため、OffsetDateTimeは常にUTCで読み出されています。これを例えば `toLocalDate` して日付を得ようとしたり、あるいは文字列parseして外部に渡そうとすると、UTC日付/日時が外部に露出してしまいます。
+これまで我々はセッションに対して有効なタイムゾーンを設定していなかったため、OffsetDateTimeは常にUTCで読み出されています。これを例えば `toLocalDate` して日付を得ようとしたり、あるいは文字列parseして外部に渡そうとすると、UTC日付/日時が外部に露出してしまいます。
 
 これを回避するには幾つか選択肢がありますが、タイムゾーンに関する制御をアプリケーションで完結すること、影響範囲が限定的な見通しの良さ等を優先して、以下のようなConverterを追加することで常にJSTとして読み出すようにしました。
 

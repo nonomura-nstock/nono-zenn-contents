@@ -2,34 +2,24 @@
   "filters": {},
   "rules": {
     "preset-ja-technical-writing": {
-      "sentence-length": {
-        "max": 120
-      },
+      "sentence-length": false,
       "max-ten": {
-        "max": 4
+        "max": 5
       },
       "arabic-kanji-numbers": true,
-      "no-mix-dearu-desumasu": {
-        "preferInHeader": "",
-        "preferInBody": "ですます",
-        "strict": true
-      },
+      "no-mix-dearu-desumasu": false,
       "ja-no-weak-phrase": false,
-      "ja-no-successive-word": true,
-      "ja-no-mixed-period": {
-        "periodMark": "。",
-        "allowPeriodMarks": []
-      },
+      "ja-no-successive-word": false,
+      "ja-no-mixed-period": true,
+      "ja-no-redundant-expression": false,
       "no-exclamation-question-mark": false,
-      "no-doubled-joshi": {
-        "strict": false,
-        "allow": ["か", "も", "や"]
-      }
+      "no-doubled-joshi": true
     },
     "preset-japanese": {
       "sentence-length": false,
       "max-ten": false,
-      "no-mix-dearu-desumasu": false
+      "no-mix-dearu-desumasu": false,
+      "no-doubled-joshi": true
     },
     "prh": {
       "rulePaths": [

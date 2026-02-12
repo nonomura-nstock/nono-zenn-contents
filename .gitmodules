@@ -1,0 +1,3 @@
+[submodule "writing-guideline"]
+	path = writing-guideline
+	url = https://github.com/nstockjp/blog-writing-guide.git

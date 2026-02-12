@@ -1,0 +1,16 @@
+{
+    "name": "Zenn Writing Environment",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+    "features": {
+      "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    },
+    "postCreateCommand": "npm install -g @openai/codex && npm init --yes && npm install zenn-cli && npx zenn init",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "negokaz.zenn-editor",
+          "anthropic.claude-code"
+        ]
+      }
+    }
+  }

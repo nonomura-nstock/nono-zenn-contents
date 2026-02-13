@@ -1,6 +1,5 @@
 {
   "name": "nono-zenn-contents",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-  "runArgs": ["--env-file", ".env"],
   "postCreateCommand": "npm install"
 }

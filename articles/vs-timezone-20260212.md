@@ -183,7 +183,7 @@ public class ClockProviderArchitectureTest {
 
 ### 取得方法を統一
 
-初期的なClockProviderは既存との実装を互換を保つようにしており、擬似的には以下のようなコードにしていました。
+統一前の、初期的なClockProviderは既存との実装を互換を保つようにしており、擬似的には以下のようなコードにしていました。
 
 ```Java:ClockProvider.java
 public final class ClockProvider {

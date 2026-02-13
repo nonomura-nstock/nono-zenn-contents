@@ -29,7 +29,9 @@ PostgreSQL（`timestamp with time zone`）との境界で起きるズレと、�
 
 ある日、QAエンジニアのAさんとの雑談の中でこんな話が出ました。
 
-Aさん「検証用に過去に作られたデータが必要になるんですが、セットアップが結構大変なんです。今はローカルのDBを直接更新してます」
+Aさん「検証のため過去に作られたデータが必要になるんですが、セットアップが結構大変なんですよね」
+筆者「今はどうやって作ってるんです？」
+Aさん「今はローカルのDBを直接更新して作ってます」
 筆者「（システム内で現在日時を取得して記録しているようなとこなら、サーバーの日時を固定するような仕組みを入れたらいいか🤔）それならやればできそうだしやっときますよー」
 
 目論見としては、Clockを保持して現在日時を供給する `ClockProvider` コンポーネントを作り、システム内の現在日時を取得する箇所ではこれを通じて取得するようにしようと考えていました。課題は実際の繋ぎ込み作業中に見つかりました。
@@ -39,7 +41,7 @@ Aさん「検証用に過去に作られたデータが必要になるんです�
 筆者「LocalDateTime.now()を素朴にやっている箇所があるな？」
 筆者「これAPIサーバーのタイムゾーンどうなってる？」
 
-```Java
+```Java:BackendApplication.java
     public static void main(String[] args) {
         // backend内でのタイムゾーンは、DBに保存されるタイムゾーンと同じUTCにしたい。
         // 環境変数TZや、コマンドライン引数user.timezone等よりも設定が優先されるよう、この箇所でUTCタイムゾーンに設定する。
@@ -68,7 +70,7 @@ Aさん「検証用に過去に作られたデータが必要になるんです�
 LocalDate、LocalDateTimeはZone、Offsetを持たない日付/日時情報です。ZonedDateTimeはタイムゾーンを持ち、OffsetDateTimeはUTCに対するオフセット（時差）を持ちます。
 
 JST（日本標準時）のOffsetは+9時間なので、例えば以下のように誤った変換/比較を行ってしまうと、9hのズレが生じ期待しない挙動を取ってしまいます。
-```Java
+```Java:SampleDateTimeTest.java
     @Test
     void 失敗例_toInstantで比較すると意図しない結果になる() {
         LocalDateTime localNow = LocalDateTime.now();
@@ -130,7 +132,7 @@ OSのタイムゾーンに依存せず常にアプリケーションで制御す
 
 日付にLocalDateを用いることは大きな議論なく決まりました。またLocalDateTimeはタイムゾーン、 Offsetを含まないため混在時のリスクが大きいことから禁止としました（関連する別の課題もありますが後述します）。
 
-ZonedDateTimeを禁止するモチベーションは積極的ではありません。ですが、OffsetDateTimeで十分取り回しうることと、当面（夏時間対応のような要件が出てくるまでは）OffsetDateTimeで対応しきれることから、実装方法の分散を避けるため一旦禁止としました。
+ZonedDateTimeの禁止は、積極的なモチベーションからではありません。ですが、OffsetDateTimeで十分取り回しうることと、当面（夏時間対応のような要件が出てくるまでは）OffsetDateTimeで対応しきれることから、実装方法の分散を避けるため一旦禁止としました。
 
 :::message
 我々の開発組織の規模では、規約の変更難易度はそこまで高くありません。
@@ -157,7 +159,7 @@ https://www.archunit.org/
 
 以下のようなRuleをArchUnitで追加し、現在時刻は必ずClockProviderを経由して取得させるようにしました。
 
-```Java
+```Java:ClockProviderArchitectureTest.java
 @AnalyzeClasses(packages = "jp.nstock.backend", importOptions = ImportOption.DoNotIncludeTests.class)
 public class ClockProviderArchitectureTest {
 
@@ -183,7 +185,7 @@ public class ClockProviderArchitectureTest {
 
 初期的なClockProviderは既存との実装を互換を保つようにしており、擬似的には以下のようなコードにしていました。
 
-```Java
+```Java:ClockProvider.java
 public final class ClockProvider {
 
     private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
@@ -257,7 +259,7 @@ public final class ClockProvider {
 
 1. 利用の少ないメソッドから順に精査しながら、日付の取得は `LocalDate today(ZoneId)`、現在日時の取得を `OffsetDateTime nowOffset(ZoneId)` を利用するように差し替えていく。また精査の結果を踏まえながらZoneIdとしては `Asia/Tokyo` を渡すようにしていく。
 2. 差し替えによりZonedDateTime、LocalDateTimeの利用がなくなった段階で利用を禁止するArchUnit Testを追加
-3. 最終的に上述の2メソッドのみが残る状態になったら、引数を除却し、ClockProvider内部で `Asia/Tokyo` を指定するようにする。
+3. 最終的に上述の2メソッドのみが残る状態になったら、引数を削除し、ClockProvider内部で `Asia/Tokyo` を指定するようにする。
 
 この段階での工夫は2で、クリーンな状態が作れた段階で随時ArchUnit Testを追加していくことで巻き戻らないように進めました。
 
@@ -276,7 +278,7 @@ https://www.postgresql.jp/document/15/html/datatype-datetime.html
 
 これを回避するには幾つか選択肢がありますが、タイムゾーンに関する制御をアプリケーションで完結すること、影響範囲が限定的な見通しの良さ等を優先して、以下のようなConverterを追加することで常にJSTとして読み出すようにしました。
 
-```Java
+```Java:JdbcConfig.java
 @Configuration
 class JdbcConfig extends AbstractJdbcConfiguration {
 
@@ -334,6 +336,6 @@ Converter以外には、jvm引数で設定してしまう、JDBC URLやHikariCP�
 
 余談ですがコーディングエージェントの関わりで触れておきたい点が2つあります。
 
-1つは影響が広範囲におよぶ修正は工数から後回しにされがちでしたが、エージェントの導入により躊躇う理由がなくなった点です。もちろん影響範囲の特定や、それがリファクタリングなら振る舞いが変わらないことをどう保証するか、などの課題は残るものの、単純な実装工数を理由に諦める必要はほぼなくなりました。特に今回のようなある種典型的な作業においては精度も期待できます。
+1つは今回のような作業を行うという意思決定について、エージェントの導入により躊躇う理由がなくなった点です。かつてはこのような影響が広範囲に及ぶような修正は、工数理由から見送られがちだった印象があります。もちろん影響範囲の特定や、リファクタリングなら振る舞いが変わらないことをどう保証するか、などの課題は残るものの、単純な実装工数を理由に諦める必要はほぼなくなりました。特に今回のようなある種典型的な作業においては精度も期待できます。
 
 もう1点は、コーディングエージェントの動作環境におけるノイズの少なさです。コーディングエージェントを活用する上でも、既存のコードベースの実装方針がブレておらず、統一的であり、仮に外れてもCIでフィードバックが出来ることは非常に有用です。その意味でdoc/ArchUnit Ruleの整備は引き続き進めていこうと思います。

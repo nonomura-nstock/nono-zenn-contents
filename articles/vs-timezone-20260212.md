@@ -18,7 +18,7 @@ Nstock株式会社でソフトウェアエンジニアをしているnonoです�
 PostgreSQL（`timestamp with time zone`）との境界で起きるズレと、その対処まで扱います。
 :::
 
-## 株式報酬SaaSのテクノロジースタック
+## 株式報酬SaaSの技術スタック
 
 * Java 25
 * Spring Boot 4.0.1

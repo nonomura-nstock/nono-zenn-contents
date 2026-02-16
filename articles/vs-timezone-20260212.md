@@ -68,7 +68,7 @@ Aさん「今はローカルのDBを直接更新して作ってます」
 * `LocalDateTime.now()`
 * `LocalDateTime.now(ZoneId.of("Asia/Tokyo"))`
 
-LocalDate、LocalDateTimeはZone、Offsetを持たない日付/日時情報です。ZonedDateTimeはタイムゾーンを持ち、OffsetDateTimeはUTCに対するオフセット（時差）を持ちます。
+LocalDate、LocalDateTimeはZone、Offsetを持たない日付と日時情報です。ZonedDateTimeはタイムゾーンを持ち、OffsetDateTimeはUTCに対するオフセット（時差）を持ちます。
 
 JST（日本標準時）のOffsetは+9時間なので、例えば以下のように誤った変換や比較を行ってしまうと、9hのズレが生じ期待しない挙動を取ってしまいます。
 ```Java:SampleDateTimeTest.java

@@ -72,31 +72,31 @@ LocalDate、LocalDateTimeはZone、Offsetを持たない日付/日時情報で�
 
 JST（日本標準時）のOffsetは+9時間なので、例えば以下のように誤った変換/比較を行ってしまうと、9hのズレが生じ期待しない挙動を取ってしまいます。
 ```Java:SampleDateTimeTest.java
-    @Test
-    void 失敗例_toInstantで比較すると意図しない結果になる() {
-        LocalDateTime localNow = LocalDateTime.now();
-        OffsetDateTime jstNow = OffsetDateTime.now(ZoneId.of("Asia/Tokyo"));
+@Test
+void redCase_UTCのLocalDateTimeをJST扱いで変換した場合_正しいJSTのOffsetDateTimeと9時間ずれる() {
+    // Arrange
+    // 表現したい瞬間: JST 2026-02-20 10:00:00（= UTC 2026-02-20 01:00:00）
+    OffsetDateTime jstTime = OffsetDateTime.of(2026, 2, 20, 10, 0, 0, 0, ZoneOffset.ofHours(9));
 
-        System.out.println("\n=== LocalDateTimeをJSTとして解釈してInstant変換 ===");
-        System.out.println("LocalDateTime.now():                      " + localNow);
-        System.out.println("OffsetDateTime.now(Asia/Tokyo):           " + jstNow);
+    // 同じ時点をLocalDateTimeで取得したとする
+    LocalDateTime utcLocalDateTime = LocalDateTime.of(2026, 2, 20, 1, 0, 0);
 
-        // LocalDateTimeをJSTとして解釈してInstantに変換（誤った解釈）
-        var localAsJstInstant = localNow.atZone(ZoneId.of("Asia/Tokyo")).toInstant();
-        var jstInstant = jstNow.toInstant();
+    // Act
+    // サーバーのdefaultTimeZoneがUTCなのに、JST = Offset+9でOffsetDateTimeに変換してしまった
+    OffsetDateTime incorrectJst = OffsetDateTime.of(utcLocalDateTime, ZoneOffset.ofHours(9));
 
-        System.out.println("LocalDateTime -> JST解釈 -> Instant:      " + localAsJstInstant);
-        System.out.println("OffsetDateTime(JST) -> Instant:           " + jstInstant);
+    // Assert
+    // 誤った変換は 2026-02-20T01:00:00+09:00 になる（UTCの数値をそのままJST時刻にしてしまう）
+    assertThat(incorrectJst).isEqualTo(
+            OffsetDateTime.of(2026, 2, 20, 1, 0, 0, 0, ZoneOffset.ofHours(9)));
 
-        // この比較は論理的に誤り！
-        // LocalDateTime.now()はJVMのデフォルトタイムゾーンの時刻を返すのに、それをJSTとして解釈してしまっている
-        // 実際の時刻より9時間進んだ時刻として扱われる
-        boolean equals = localAsJstInstant.equals(jstInstant);
-        System.out.println("equals()の結果: " + equals + " (false - 9時間のずれが発生)");
-
-        long hoursDiff = java.time.Duration.between(jstInstant, localAsJstInstant).toHours();
-        System.out.println("時差: " + Math.abs(hoursDiff) + "時間のずれ");
-    }
+    // 正しいJSTは 2026-02-20T10:00:00+09:00
+    assertThat(jstTime).isEqualTo(
+            OffsetDateTime.of(2026, 2, 20, 10, 0, 0, 0, ZoneOffset.ofHours(9)));
+    
+    // 時点として異なるので当然一致しない
+    assertThat(incorrectJst).isNotEqualTo(jstTime);
+}
 ```
 
 初動としてこのような処理をしている箇所がないか調査しましたが、取得した現在日時の大半は業務ロジックに関わりのないメタデータであり、実害はありませんでした。一方で将来に向けて以下のような懸念がありました。

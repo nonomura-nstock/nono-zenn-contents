@@ -131,7 +131,7 @@ APIサーバー実行環境のタイムゾーンに依存せず常にアプリ�
 * 日時はOffsetDateTimeを用いる。
 * ZonedDateTime、LocalDateTimeは利用禁止
 
-日付にLocalDateを用いることは大きな議論なく決まりました。またLocalDateTimeはタイムゾーン、 Offsetを含まないため混在時のリスクが大きいことから禁止としました（関連する別の課題もありますが後述します）。
+日付にLocalDateを用いることは大きな議論なく決まりました。またLocalDateTimeはタイムゾーン、 Offsetを含まないため混在時のリスクが大きいことから禁止としました。
 
 ZonedDateTimeの禁止は、積極的なモチベーションからではありません。ですが、OffsetDateTimeで十分取り回しうることと、当面（夏時間対応のような要件が出てくるまでは）OffsetDateTimeで対応しきれることから、実装方法の分散を避けるため一旦禁止としました。
 

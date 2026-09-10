@@ -3,7 +3,8 @@ title: "プロダクト内のタイムゾーンの不統一をどげんかする
 emoji: "🕙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["java", "spring", "archunit", "timezone", "リファクタリング"]
-published: false
+published: true
+publication_name: "nstock"
 ---
 
 ## これはなに
